@@ -58,13 +58,17 @@ def convert(input_docx, output_pdf):
 
 def convert_to_pdf_cloud(input_docx, output_pdf):
     try:
-        import subprocess
-        # Convert using LibreOffice
-        cmd = ['libreoffice', '--headless', '--convert-to', 'pdf', input_docx, '--outdir', os.path.dirname(output_pdf)]
-        subprocess.run(cmd, timeout=30)
+        from weasyprint import HTML, CSS
+        # Convert DOCX to HTML first
+        with open(input_docx, 'rb') as docx_file:
+            html_content = docx_file.read().decode('utf-8')
+        
+        # Convert HTML to PDF
+        HTML(string=html_content).write_pdf(output_pdf)
         return True
     except Exception as e:
         st.error(f"PDF Conversion error: {str(e)}")
+        # Fallback to DOCX download
         return False
 
 # Define the template path
@@ -127,6 +131,7 @@ def replace_text_preserve_formatting(doc, replacements):
                 if key_runs:
                     key_runs[0].text = str(value)
                     for run in key_runs[1:]:
+                    
                         run.text = ""
 
     # Process all paragraphs including those in text boxes
