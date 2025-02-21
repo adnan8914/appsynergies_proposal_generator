@@ -164,52 +164,110 @@ def main():
         ["AI Automation Proposal", "Digital Marketing Proposal", "Business Automations Proposal", "IT Consultation Contract"]
     )
     
+    # Clear form when proposal type changes
+    if 'previous_type' not in st.session_state:
+        st.session_state.previous_type = proposal_type
+    elif st.session_state.previous_type != proposal_type:
+        st.session_state.clear()
+        st.session_state.previous_type = proposal_type
+
     if proposal_type == "AI Automation Proposal":
         template_path = AI_TEMPLATE
-    elif proposal_type == "Digital Marketing Proposal":
-        template_path = DM_TEMPLATE
-    elif proposal_type == "Business Automations Proposal":
-        template_path = BA_TEMPLATE
-    else:  # IT Consultation Contract
-        template_path = CONTRACT_TEMPLATE
-    
-    # Client Information
-    st.header("Client Information")
-    col1, col2 = st.columns(2)
-    with col1:
+        # AI Automation form fields
         client_name = st.text_input("Client Name", key="ai_name")
         email = st.text_input("Email", key="ai_email")
         phone = st.text_input("Phone", key="ai_phone")
-    with col2:    
         country = st.text_input("Country", key="ai_country")
         proposal_date = st.date_input("Date", datetime.datetime.now(), key="ai_date")
-    
-    # Project Pricing
-    st.header("Project Pricing")
-    col1, col2 = st.columns(2)
-    with col1:
         landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f")
         admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f")
         crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f")
-    with col2:
         manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f")
         social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f")
         ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f")
-    
-    # Additional Features & Enhancements
-    additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
-                                              min_value=0.0, 
-                                              step=0.01, 
-                                              format="%.2f",
-                                              value=250.00)  # Default value set to 250
-    
-    total_price = (landing_page_price + admin_panel_price + crm_price + 
-                  manychat_price + social_media_price + ai_calling_price)
-    annual_maintenance = total_price * 0.20
-    
-    # Signature Details
-    st.header("Signature Details")
-    company_representative = st.text_input("Company Representative")
+        additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
+                                                  min_value=0.0, 
+                                                  step=0.01, 
+                                                  format="%.2f",
+                                                  value=250.00)  # Default value set to 250
+        total_price = (landing_page_price + admin_panel_price + crm_price + 
+                      manychat_price + social_media_price + ai_calling_price)
+        annual_maintenance = total_price * 0.20
+        company_representative = st.text_input("Company Representative")
+
+    elif proposal_type == "Digital Marketing Proposal":
+        template_path = DM_TEMPLATE
+        # Digital Marketing form fields
+        st.header("Client Information")
+        client_name = st.text_input("Client Name", key="dm_name")
+        designation = st.text_input("Designation", key="dm_designation")
+        contact_no = st.text_input("Contact Number", key="dm_contact")
+        email_id = st.text_input("Email ID", key="dm_email")
+        country = st.text_input("Country", key="dm_country")
+        proposal_date = st.date_input("Date", datetime.datetime.now(), key="dm_date")
+        landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f")
+        admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f")
+        crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f")
+        manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f")
+        social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f")
+        ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f")
+        additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
+                                                  min_value=0.0, 
+                                                  step=0.01, 
+                                                  format="%.2f",
+                                                  value=250.00)  # Default value set to 250
+        total_price = (landing_page_price + admin_panel_price + crm_price + 
+                      manychat_price + social_media_price + ai_calling_price)
+        annual_maintenance = total_price * 0.20
+        company_representative = st.text_input("Company Representative")
+
+    elif proposal_type == "Business Automations Proposal":
+        template_path = BA_TEMPLATE
+        # Business Automation form fields
+        st.header("Client Information")
+        client_name = st.text_input("Client Name", key="ba_name")
+        contact_no = st.text_input("Contact Number", key="ba_contact")
+        email_id = st.text_input("Email ID", key="ba_email")
+        country = st.text_input("Country", key="ba_country")
+        proposal_date = st.date_input("Date", datetime.datetime.now(), key="ba_date")
+        landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f")
+        admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f")
+        crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f")
+        manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f")
+        social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f")
+        ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f")
+        additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
+                                                  min_value=0.0, 
+                                                  step=0.01, 
+                                                  format="%.2f",
+                                                  value=250.00)  # Default value set to 250
+        total_price = (landing_page_price + admin_panel_price + crm_price + 
+                      manychat_price + social_media_price + ai_calling_price)
+        annual_maintenance = total_price * 0.20
+        company_representative = st.text_input("Company Representative")
+
+    else:  # IT Consultation Contract
+        template_path = CONTRACT_TEMPLATE
+        # Contract form fields
+        st.header("Contract Information")
+        client_name = st.text_input("Client Name", key="contract_name")
+        client_company_address = st.text_area("Company Address", key="contract_address")
+        proposal_date = st.date_input("Date", datetime.datetime.now(), key="contract_date")
+        landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f")
+        admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f")
+        crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f")
+        manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f")
+        social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f")
+        ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f")
+        additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
+                                                  min_value=0.0, 
+                                                  step=0.01, 
+                                                  format="%.2f",
+                                                  value=250.00)  # Default value set to 250
+        total_price = (landing_page_price + admin_panel_price + crm_price + 
+                      manychat_price + social_media_price + ai_calling_price)
+        annual_maintenance = total_price * 0.20
+        company_representative = st.text_input("Company Representative")
 
     # Updated replacements dictionary
     replacements = {
