@@ -59,8 +59,12 @@ def convert(input_docx, output_pdf):
 def convert_to_pdf_cloud(input_docx, output_pdf):
     try:
         import subprocess
-        # Convert using unoconv
-        subprocess.run(['unoconv', '-f', 'pdf', '-o', output_pdf, input_docx], check=True)
+        # Convert using abiword
+        subprocess.run(['abiword', '--to=pdf', input_docx], check=True)
+        # Abiword creates PDF in same directory as input with .pdf extension
+        import shutil
+        pdf_name = input_docx.rsplit('.', 1)[0] + '.pdf'
+        shutil.move(pdf_name, output_pdf)
         return True
     except Exception as e:
         st.error(f"PDF Conversion error: {str(e)}")
