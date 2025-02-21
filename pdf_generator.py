@@ -58,13 +58,9 @@ def convert(input_docx, output_pdf):
 
 def convert_to_pdf_cloud(input_docx, output_pdf):
     try:
-        import pdfkit
-        # Convert DOCX to HTML first
-        with open(input_docx, 'rb') as docx_file:
-            html_content = docx_file.read().decode('utf-8')
-        
-        # Convert to PDF using pdfkit
-        pdfkit.from_string(html_content, output_pdf)
+        import subprocess
+        # Convert using unoconv
+        subprocess.run(['unoconv', '-f', 'pdf', '-o', output_pdf, input_docx], check=True)
         return True
     except Exception as e:
         st.error(f"PDF Conversion error: {str(e)}")
