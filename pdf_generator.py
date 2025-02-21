@@ -58,13 +58,13 @@ def convert(input_docx, output_pdf):
 
 def convert_to_pdf_cloud(input_docx, output_pdf):
     try:
-        from weasyprint import HTML, CSS
+        import pdfkit
         # Convert DOCX to HTML first
         with open(input_docx, 'rb') as docx_file:
             html_content = docx_file.read().decode('utf-8')
         
-        # Convert HTML to PDF
-        HTML(string=html_content).write_pdf(output_pdf)
+        # Convert to PDF using pdfkit
+        pdfkit.from_string(html_content, output_pdf)
         return True
     except Exception as e:
         st.error(f"PDF Conversion error: {str(e)}")
