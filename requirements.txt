@@ -1,7 +1,7 @@
 streamlit
 python-docx
-pywin32
-docx2pdf
 Pillow==10.2.0
 num2words==0.5.13
 python-dateutil==2.8.2
+python-uno
+weasyprint

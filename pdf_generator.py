@@ -3,11 +3,69 @@ import datetime
 import tempfile
 import os
 from docx import Document
-import win32com.client
-import pythoncom
-from docx.shared import RGBColor, Pt
-import shutil
-from docx2pdf import convert
+import platform
+
+# Check if running on Windows or cloud
+IS_WINDOWS = platform.system() == "Windows"
+
+if IS_WINDOWS:
+    import win32com.client
+    import pythoncom
+    from docx2pdf import convert
+else:
+    # Alternative PDF conversion for cloud (could offer DOCX download only)
+    def convert(input_docx, output_pdf):
+        st.warning("PDF conversion is only available in Windows. Downloading DOCX instead.")
+        return False
+
+def convert(input_docx, output_pdf):
+    if IS_WINDOWS:
+        try:
+            pythoncom.CoInitialize()
+            word = win32com.client.Dispatch('Word.Application')
+            doc = None
+            try:
+                word.Visible = False
+                
+                # Ensure paths are absolute and use raw strings
+                input_path = os.path.abspath(input_docx)
+                output_path = os.path.abspath(output_pdf)
+                
+                # Open document
+                doc = word.Documents.Open(input_path)
+                
+                # Try different SaveAs methods
+                try:
+                    doc.SaveAs(FileName=output_path, FileFormat=17)
+                except:
+                    try:
+                        doc.SaveAs(output_path, 17)
+                    except:
+                        doc.ExportAsFixedFormat(output_path, 17)
+                return True
+            finally:
+                # Clean up
+                if doc:
+                    doc.Close()
+                word.Quit()
+        except Exception as e:
+            st.error(f"Conversion error: {str(e)}")
+            return False
+        finally:
+            pythoncom.CoUninitialize()
+    else:
+        return convert_to_pdf_cloud(input_docx, output_pdf)
+
+def convert_to_pdf_cloud(input_docx, output_pdf):
+    try:
+        import subprocess
+        # Convert using LibreOffice
+        cmd = ['libreoffice', '--headless', '--convert-to', 'pdf', input_docx, '--outdir', os.path.dirname(output_pdf)]
+        subprocess.run(cmd, timeout=30)
+        return True
+    except Exception as e:
+        st.error(f"PDF Conversion error: {str(e)}")
+        return False
 
 # Define the template path
 TEMPLATE_PATH = r"C:\Users\Adnan\.cursor-tutor\new_as_pdf_generator\Ai_automation.docx"
@@ -116,41 +174,6 @@ def replace_text_preserve_formatting(doc, replacements):
                         replace_in_paragraph(paragraph, replacements)
     except:
         pass
-
-def convert(input_docx, output_pdf):
-    pythoncom.CoInitialize()
-    try:
-        word = win32com.client.Dispatch('Word.Application')
-        doc = None
-        try:
-            word.Visible = False
-            
-            # Ensure paths are absolute and use raw strings
-            input_path = os.path.abspath(input_docx)
-            output_path = os.path.abspath(output_pdf)
-            
-            # Open document
-            doc = word.Documents.Open(input_path)
-            
-            # Try different SaveAs methods
-            try:
-                doc.SaveAs(FileName=output_path, FileFormat=17)
-            except:
-                try:
-                    doc.SaveAs(output_path, 17)
-                except:
-                    doc.ExportAsFixedFormat(output_path, 17)
-            
-        finally:
-            # Clean up
-            if doc:
-                doc.Close()
-            word.Quit()
-    except Exception as e:
-        st.error(f"Conversion error: {str(e)}")
-        raise
-    finally:
-        pythoncom.CoUninitialize()
 
 def main():
     st.title("Proposal Generator")
@@ -376,16 +399,12 @@ def main():
             
             temp_dir = tempfile.mkdtemp()
             output_docx = os.path.join(temp_dir, f"{proposal_type}_{client_name}.docx")
-            output_pdf = os.path.join(temp_dir, f"{proposal_type}_{client_name}.pdf")
-            
-            # Save DOCX
             doc.save(output_docx)
             
-            # Convert to PDF
-            try:
-                convert(output_docx, output_pdf)
-                
-                if os.path.exists(output_pdf):
+            if IS_WINDOWS:
+                # Windows conversion
+                output_pdf = os.path.join(temp_dir, f"{proposal_type}_{client_name}.pdf")
+                if convert(output_docx, output_pdf):
                     with open(output_pdf, "rb") as pdf_file:
                         pdf_bytes = pdf_file.read()
                         st.download_button(
@@ -395,26 +414,25 @@ def main():
                             mime="application/pdf"
                         )
                     st.success("Proposal generated successfully!")
-                else:
-                    st.error("Failed to create PDF")
-                    
-            except Exception as e:
-                st.error(f"Error converting to PDF: {str(e)}")
-                # Offer DOCX download as fallback
-                with open(output_docx, "rb") as docx_file:
-                    docx_bytes = docx_file.read()
-                    st.download_button(
-                        label="Download Proposal DOCX (PDF conversion failed)",
-                        data=docx_bytes,
-                        file_name=f"{proposal_type}_{client_name}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    )
+            else:
+                # Cloud conversion
+                output_pdf = os.path.join(temp_dir, f"{proposal_type}_{client_name}.pdf")
+                if convert_to_pdf_cloud(output_docx, output_pdf):
+                    with open(output_pdf, "rb") as pdf_file:
+                        pdf_bytes = pdf_file.read()
+                        st.download_button(
+                            label="Download Proposal PDF",
+                            data=pdf_bytes,
+                            file_name=f"{proposal_type}_{client_name}.pdf",
+                            mime="application/pdf"
+                        )
+                    st.success("Proposal generated successfully!")
             
         except Exception as e:
             st.error(f"Error generating proposal: {str(e)}")
         finally:
             try:
-                shutil.rmtree(temp_dir)
+                os.rmdir(temp_dir)
             except:
                 pass
 
