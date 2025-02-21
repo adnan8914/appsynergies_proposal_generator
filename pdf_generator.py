@@ -1,8 +1,9 @@
 import os
 import tempfile
 from docx import Document
-import platform
 import streamlit as st
+from docx2pdf import convert
+import platform
 
 # Check if running on Windows or cloud
 IS_WINDOWS = platform.system() == "Windows"
@@ -48,10 +49,8 @@ def convert_to_pdf(input_docx, output_pdf):
     finally:
         pythoncom.CoUninitialize()
 
-# Define template paths relative to the script
+# Define template paths
 TEMPLATE_DIR = "templates"
-
-# These should match your template filenames exactly
 template_paths = {
     "AI Automation": "Ai_automation.docx",
     "Digital Marketing": "DM Proposal.docx",
@@ -166,15 +165,27 @@ def generate_proposal(proposal_type, client_name, replacements):
         
         temp_dir = tempfile.mkdtemp()
         output_docx = os.path.join(temp_dir, f"{proposal_type}_{client_name}.docx")
+        output_pdf = os.path.join(temp_dir, f"{proposal_type}_{client_name}.pdf")
+        
+        # Save DOCX
         doc.save(output_docx)
         
-        # In cloud, always return DOCX
-        with open(output_docx, "rb") as docx_file:
-            docx_bytes = docx_file.read()
-            st.success("Proposal generated successfully!")
-            return (docx_bytes,
-                   f"{proposal_type}_{client_name}.docx",
-                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        # Try PDF conversion
+        try:
+            convert(output_docx, output_pdf)
+            with open(output_pdf, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
+                st.success("PDF generated successfully!")
+                return (pdf_bytes, 
+                       f"{proposal_type}_{client_name}.pdf",
+                       "application/pdf")
+        except Exception as pdf_error:
+            st.warning("PDF conversion failed, providing DOCX instead")
+            with open(output_docx, "rb") as docx_file:
+                docx_bytes = docx_file.read()
+                return (docx_bytes,
+                       f"{proposal_type}_{client_name}.docx",
+                       "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             
     except Exception as e:
         st.error(f"Error generating proposal: {str(e)}")
