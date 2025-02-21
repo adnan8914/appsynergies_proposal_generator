@@ -26,25 +26,12 @@ def convert(input_docx, output_pdf):
             doc = None
             try:
                 word.Visible = False
-                
-                # Ensure paths are absolute and use raw strings
                 input_path = os.path.abspath(input_docx)
                 output_path = os.path.abspath(output_pdf)
-                
-                # Open document
                 doc = word.Documents.Open(input_path)
-                
-                # Try different SaveAs methods
-                try:
-                    doc.SaveAs(FileName=output_path, FileFormat=17)
-                except:
-                    try:
-                        doc.SaveAs(output_path, 17)
-                    except:
-                        doc.ExportAsFixedFormat(output_path, 17)
+                doc.SaveAs(FileName=output_path, FileFormat=17)
                 return True
             finally:
-                # Clean up
                 if doc:
                     doc.Close()
                 word.Quit()
@@ -53,23 +40,7 @@ def convert(input_docx, output_pdf):
             return False
         finally:
             pythoncom.CoUninitialize()
-    else:
-        return convert_to_pdf_cloud(input_docx, output_pdf)
-
-def convert_to_pdf_cloud(input_docx, output_pdf):
-    try:
-        import subprocess
-        # Convert using abiword
-        subprocess.run(['abiword', '--to=pdf', input_docx], check=True)
-        # Abiword creates PDF in same directory as input with .pdf extension
-        import shutil
-        pdf_name = input_docx.rsplit('.', 1)[0] + '.pdf'
-        shutil.move(pdf_name, output_pdf)
-        return True
-    except Exception as e:
-        st.error(f"PDF Conversion error: {str(e)}")
-        # Fallback to DOCX download
-        return False
+    return False
 
 # Define template paths relative to the script
 TEMPLATE_DIR = "templates"  # Create this directory in your repository
@@ -287,9 +258,9 @@ def main():
             doc.save(output_docx)
             
             if IS_WINDOWS:
-                # Windows conversion
+                # Try PDF conversion on Windows
                 output_pdf = os.path.join(temp_dir, f"{proposal_type}_{client_name}.pdf")
-                if convert(output_docx, output_pdf):
+                if convert(output_docx, output_pdf) and os.path.exists(output_pdf):
                     with open(output_pdf, "rb") as pdf_file:
                         pdf_bytes = pdf_file.read()
                         st.download_button(
@@ -300,18 +271,16 @@ def main():
                         )
                     st.success("Proposal generated successfully!")
             else:
-                # Cloud conversion
-                output_pdf = os.path.join(temp_dir, f"{proposal_type}_{client_name}.pdf")
-                if convert_to_pdf_cloud(output_docx, output_pdf):
-                    with open(output_pdf, "rb") as pdf_file:
-                        pdf_bytes = pdf_file.read()
-                        st.download_button(
-                            label="Download Proposal PDF",
-                            data=pdf_bytes,
-                            file_name=f"{proposal_type}_{client_name}.pdf",
-                            mime="application/pdf"
-                        )
-                    st.success("Proposal generated successfully!")
+                # On cloud, offer DOCX download
+                with open(output_docx, "rb") as docx_file:
+                    docx_bytes = docx_file.read()
+                    st.download_button(
+                        label="Download Proposal DOCX",
+                        data=docx_bytes,
+                        file_name=f"{proposal_type}_{client_name}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    )
+                st.success("Proposal generated successfully!")
             
         except Exception as e:
             st.error(f"Error generating proposal: {str(e)}")
