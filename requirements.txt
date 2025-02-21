@@ -1,4 +1,4 @@
-streamlit
+streamlit>=1.27.0
 python-docx
 Pillow==10.2.0
 num2words==0.5.13

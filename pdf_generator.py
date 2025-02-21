@@ -172,8 +172,9 @@ def main():
         # Restore selection
         st.session_state.proposal_type = current_type
         st.session_state.previous_type = current_type
-        # Force rerun to clear the form
-        st.experimental_rerun()
+        # Force rerun to clear the form using older method for compatibility
+        st.empty()
+        st._rerun()
 
     if proposal_type == "AI Automation Proposal":
         template_path = os.path.join(TEMPLATE_DIR, "Ai_automation.docx")
