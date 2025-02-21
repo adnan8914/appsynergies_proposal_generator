@@ -71,8 +71,12 @@ def convert_to_pdf_cloud(input_docx, output_pdf):
         # Fallback to DOCX download
         return False
 
-# Define the template path
-TEMPLATE_PATH = r"C:\Users\Adnan\.cursor-tutor\new_as_pdf_generator\Ai_automation.docx"
+# Define template paths relative to the script
+TEMPLATE_DIR = "templates"  # Create this directory in your repository
+AI_TEMPLATE = os.path.join(TEMPLATE_DIR, "Ai_automation.docx")
+DM_TEMPLATE = os.path.join(TEMPLATE_DIR, "DM Proposal.docx")
+BA_TEMPLATE = os.path.join(TEMPLATE_DIR, "Business Automations Proposal.docx")
+CONTRACT_TEMPLATE = os.path.join(TEMPLATE_DIR, "Contract Agreement.docx")
 
 def replace_text_preserve_formatting(doc, replacements):
     """Replace text while preserving formatting and images"""
@@ -190,194 +194,70 @@ def main():
     )
     
     if proposal_type == "AI Automation Proposal":
-        template_path = r"C:\Users\Adnan\.cursor-tutor\new_as_pdf_generator\Ai_automation.docx"
-        
-        # Client Information
-        st.header("Client Information")
-        col1, col2 = st.columns(2)
-        with col1:
-            client_name = st.text_input("Client Name", key="ai_name")
-            email = st.text_input("Email", key="ai_email")
-            phone = st.text_input("Phone", key="ai_phone")
-        with col2:    
-            country = st.text_input("Country", key="ai_country")
-            proposal_date = st.date_input("Date", datetime.datetime.now(), key="ai_date")
-        
-        # Project Pricing
-        st.header("Project Pricing")
-        col1, col2 = st.columns(2)
-        with col1:
-            landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f")
-            admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f")
-            crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f")
-        with col2:
-            manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f")
-            social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f")
-            ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f")
-        
-        # Additional Features & Enhancements
-        additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
-                                                  min_value=0.0, 
-                                                  step=0.01, 
-                                                  format="%.2f",
-                                                  value=250.00)  # Default value set to 250
-        
-        total_price = (landing_page_price + admin_panel_price + crm_price + 
-                      manychat_price + social_media_price + ai_calling_price)
-        annual_maintenance = total_price * 0.20
-        
-        # Signature Details
-        st.header("Signature Details")
-        company_representative = st.text_input("Company Representative")
-
-        # Updated replacements dictionary
-        replacements = {
-            "{client_name}": client_name,
-            "{Email_address}": email,
-            "{Phone_no}": phone,
-            "{country_name}": country,
-            "{date}": proposal_date.strftime("%d/%m/%Y"),
-            "{landing page price}": landing_page_price,
-            "{admin panel price}": admin_panel_price,
-            "{CRM Automation price}": crm_price,
-            "{Manychat price}": manychat_price,
-            "{SMP price}": social_media_price,
-            "{AI calling price}": ai_calling_price,
-            "{Total amount}": total_price,
-            "{AM price}": annual_maintenance,
-            "{Additional}": additional_features_price,
-            "{company_representative}": company_representative,
-        }
-
+        template_path = AI_TEMPLATE
     elif proposal_type == "Digital Marketing Proposal":
-        template_path = r"C:\Users\Adnan\.cursor-tutor\new_as_pdf_generator\DM Proposal.docx"
-        
-        # Digital Marketing proposal inputs
-        st.header("Client Information")
-        col1, col2 = st.columns(2)
-        with col1:
-            client_name = st.text_input("Client Name", key="dm_name")
-            designation = st.text_input("Designation", key="dm_designation")
-            contact_no = st.text_input("Contact Number", key="dm_contact")
-        with col2:
-            email_id = st.text_input("Email ID", key="dm_email")
-            proposal_date = st.date_input("Date", datetime.datetime.now(), key="dm_date")
-        
-        # Mutually Agreed Points
-        mutually_agreed_points = st.text_area("Mutually Agreed Points")
-        
-        # Digital Marketing Services Pricing
-        st.header("Digital Marketing Services Pricing")
-        col1, col2 = st.columns(2)
-        with col1:
-            social_media_posts = st.number_input("30 Creative Social Media Posts", min_value=0.0, step=0.01, format="%.2f", key="dm_smp")
-            research_and_dev = st.number_input("Marketing Research + 1 Month Ads", min_value=0.0, step=0.01, format="%.2f", key="dm_rnd")
-        with col2:
-            monthly_cost = st.number_input("Monthly Maintenance", min_value=0.0, step=0.01, format="%.2f", key="dm_monthly")
-        
-        # Calculate totals
-        subtotal = social_media_posts + research_and_dev + monthly_cost
-        gst = subtotal * 0.18  # 18% GST
-        total_amount = subtotal + gst
-        
-        # Calculate payment schedule with dollar formatting
-        advance = total_amount * 0.5
-        balance = total_amount * 0.5
-        
-        replacements = {
-            "{client_name}": client_name,
-            "{designation}": designation,
-            "{contact_no}": contact_no,
-            "{email_id}": email_id,
-            "{date}": proposal_date.strftime("%d/%m/%Y"),
-            "{Mutually_agreed_points}": mutually_agreed_points,
-            "{3d_SMP}": f"$ {social_media_posts:,.2f}",
-            "{R&D}": f"$ {research_and_dev:,.2f}",
-            "{monthly_cost}": f"$ {monthly_cost:,.2f}",
-            "{gst}": f"$ {gst:,.2f}",
-            "{total_amount}": f"$ {total_amount:,.2f}",
-            "{Advance}": f"$ {advance:,.2f}",
-            "{balance}": f"$ {balance:,.2f}"
-        }
-
+        template_path = DM_TEMPLATE
     elif proposal_type == "Business Automations Proposal":
-        template_path = r"C:\Users\Adnan\.cursor-tutor\new_as_pdf_generator\Business Automations Proposal.docx"
-        
-        # Client Information
-        st.header("Client Information")
-        col1, col2 = st.columns(2)
-        with col1:
-            client_name = st.text_input("Client Name", key="ba_name")
-            contact_no = st.text_input("Contact Number", key="ba_contact")
-            email_id = st.text_input("Email ID", key="ba_email_id")
-        with col2:
-            proposal_date = st.date_input("Date", datetime.datetime.now(), key="ba_date")
-            validity_date = st.date_input("Validity Date", key="ba_validity")
-
-        # Mutually Agreed Points
-        mutually_agreed_points = st.text_area("Mutually Agreed Points", key="ba_points")
-        
-        # Week 1 Details
-        st.header("Week 1 Details")
-        week1_descrptn = st.text_area("Week 1 Description", key="ba_week1_desc")
-        week1_price = st.number_input("Week 1 Price", min_value=0.0, step=0.01, format="%.2f", key="ba_week1_price")
-
-        # Future Services Pricing
-        st.header("Future Services Pricing")
-        col1, col2 = st.columns(2)
-        with col1:
-            ai_auto_price = st.number_input("AI Automations Price", min_value=0.0, step=0.01, format="%.2f", key="ba_ai_auto")
-            whts_price = st.number_input("WhatsApp Automation Price", min_value=0.0, step=0.01, format="%.2f", key="ba_whts")
-            crm_price = st.number_input("CRM Setup Price", min_value=0.0, step=0.01, format="%.2f", key="ba_crm")
-            email_price = st.number_input("Email Marketing Setup Price", min_value=0.0, step=0.01, format="%.2f", key="ba_email_price")
-            make_price = st.number_input("Make/Zapier Automation Price", min_value=0.0, step=0.01, format="%.2f", key="ba_make")
-        with col2:
-            firefly_price = st.number_input("Firefly Meeting Price", min_value=0.0, step=0.01, format="%.2f", key="ba_firefly")
-            chatbot_price = st.number_input("AI Chatbot Price", min_value=0.0, step=0.01, format="%.2f", key="ba_chatbot")
-            pdf_gen_pr = st.number_input("PDF Generation Price", min_value=0.0, step=0.01, format="%.2f", key="ba_pdf")
-            ai_mdl_price = st.number_input("AI Social Media Price", min_value=0.0, step=0.01, format="%.2f", key="ba_ai_mdl")
-            cstm_ai_price = st.number_input("Custom AI Models Price", min_value=0.0, step=0.01, format="%.2f", key="ba_cstm_ai")
-
-        # Replacements dictionary
-        replacements = {
-            "{client_name}": client_name,
-            "{contact_no}": contact_no,
-            "{email_id}": email_id,
-            "{date}": proposal_date.strftime("%d/%m/%Y"),
-            "{validity_date}": validity_date.strftime("%d/%m/%Y"),
-            "{mutually_agreed_points}": mutually_agreed_points,
-            "{week1_descrptn}": week1_descrptn,
-            "{week1_price}": f"$ {week1_price:,.2f}",
-            "{ai_auto_price}": f"$ {ai_auto_price:,.2f}",
-            "{whts_price}": f"$ {whts_price:,.2f}",
-            "{crm_price}": f"$ {crm_price:,.2f}",
-            "{email_price}": f"$ {email_price:,.2f}",
-            "{make_price}": f"$ {make_price:,.2f}",
-            "{firefly_price}": f"$ {firefly_price:,.2f}",
-            "{chatbot_price}": f"$ {chatbot_price:,.2f}",
-            "{pdf_gen_pr}": f"$ {pdf_gen_pr:,.2f}",
-            "{ai_mdl_price}": f"$ {ai_mdl_price:,.2f}",
-            "{cstm_ai_price}": f"$ {cstm_ai_price:,.2f}"
-        }
-
+        template_path = BA_TEMPLATE
     else:  # IT Consultation Contract
-        template_path = r"C:\Users\Adnan\.cursor-tutor\new_as_pdf_generator\Contract Agreement.docx"
-        
-        # Client Information
-        st.header("Contract Information")
-        col1, col2 = st.columns(2)
-        with col1:
-            client_name = st.text_input("Client Name", key="contract_name")
-            client_company_address = st.text_area("Company Address", key="contract_address")
-        with col2:
-            contract_date = st.date_input("Contract Date", datetime.datetime.now(), key="contract_date")
+        template_path = CONTRACT_TEMPLATE
+    
+    # Client Information
+    st.header("Client Information")
+    col1, col2 = st.columns(2)
+    with col1:
+        client_name = st.text_input("Client Name", key="ai_name")
+        email = st.text_input("Email", key="ai_email")
+        phone = st.text_input("Phone", key="ai_phone")
+    with col2:    
+        country = st.text_input("Country", key="ai_country")
+        proposal_date = st.date_input("Date", datetime.datetime.now(), key="ai_date")
+    
+    # Project Pricing
+    st.header("Project Pricing")
+    col1, col2 = st.columns(2)
+    with col1:
+        landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f")
+        admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f")
+        crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f")
+    with col2:
+        manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f")
+        social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f")
+        ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f")
+    
+    # Additional Features & Enhancements
+    additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
+                                              min_value=0.0, 
+                                              step=0.01, 
+                                              format="%.2f",
+                                              value=250.00)  # Default value set to 250
+    
+    total_price = (landing_page_price + admin_panel_price + crm_price + 
+                  manychat_price + social_media_price + ai_calling_price)
+    annual_maintenance = total_price * 0.20
+    
+    # Signature Details
+    st.header("Signature Details")
+    company_representative = st.text_input("Company Representative")
 
-        # Replacements dictionary
-        replacements = {
-            "{date}": contract_date.strftime("%d/%m/%Y"),
-            "{client_name}": client_name,
-            "{client_company_address}": client_company_address
-        }
+    # Updated replacements dictionary
+    replacements = {
+        "{client_name}": client_name,
+        "{Email_address}": email,
+        "{Phone_no}": phone,
+        "{country_name}": country,
+        "{date}": proposal_date.strftime("%d/%m/%Y"),
+        "{landing page price}": landing_page_price,
+        "{admin panel price}": admin_panel_price,
+        "{CRM Automation price}": crm_price,
+        "{Manychat price}": manychat_price,
+        "{SMP price}": social_media_price,
+        "{AI calling price}": ai_calling_price,
+        "{Total amount}": total_price,
+        "{AM price}": annual_maintenance,
+        "{Additional}": additional_features_price,
+        "{company_representative}": company_representative,
+    }
 
     # Generate proposal button and processing - same for all types
     if st.button("Generate Proposal"):
