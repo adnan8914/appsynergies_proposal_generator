@@ -43,11 +43,7 @@ def convert(input_docx, output_pdf):
     return False
 
 # Define template paths relative to the script
-TEMPLATE_DIR = "templates"  # Create this directory in your repository
-AI_TEMPLATE = os.path.join(TEMPLATE_DIR, "Ai_automation.docx")
-DM_TEMPLATE = os.path.join(TEMPLATE_DIR, "DM Proposal.docx")
-BA_TEMPLATE = os.path.join(TEMPLATE_DIR, "Business Automations Proposal.docx")
-CONTRACT_TEMPLATE = os.path.join(TEMPLATE_DIR, "Contract Agreement.docx")
+TEMPLATE_DIR = "templates"
 
 def replace_text_preserve_formatting(doc, replacements):
     """Replace text while preserving formatting and images"""
@@ -158,21 +154,26 @@ def replace_text_preserve_formatting(doc, replacements):
 def main():
     st.title("Proposal Generator")
     
-    # Initialize empty replacements dictionary
-    replacements = {}
-    
     # Proposal Type Selection
     proposal_type = st.selectbox(
         "Select Proposal Type",
-        ["AI Automation Proposal", "Digital Marketing Proposal", "Business Automations Proposal", "IT Consultation Contract"]
+        ["AI Automation Proposal", "Digital Marketing Proposal", "Business Automations Proposal", "IT Consultation Contract"],
+        key="proposal_type"
     )
     
     # Clear form when proposal type changes
     if 'previous_type' not in st.session_state:
         st.session_state.previous_type = proposal_type
     elif st.session_state.previous_type != proposal_type:
+        # Store current selection
+        current_type = proposal_type
+        # Clear session state
         st.session_state.clear()
-        st.session_state.previous_type = proposal_type
+        # Restore selection
+        st.session_state.proposal_type = current_type
+        st.session_state.previous_type = current_type
+        # Force rerun to clear the form
+        st.experimental_rerun()
 
     if proposal_type == "AI Automation Proposal":
         template_path = os.path.join(TEMPLATE_DIR, "Ai_automation.docx")
@@ -181,28 +182,42 @@ def main():
         st.header("Client Information")
         col1, col2 = st.columns(2)
         with col1:
-            client_name = st.text_input("Client Name", key="ai_name")
+            client_name = st.text_input("Client Name", key="ai_client_name")
             email = st.text_input("Email", key="ai_email")
-        with col2:
             phone = st.text_input("Phone", key="ai_phone")
+        with col2:    
             country = st.text_input("Country", key="ai_country")
+            proposal_date = st.date_input("Date", datetime.datetime.now(), key="ai_date")
         
-        proposal_date = st.date_input("Date", datetime.datetime.now(), key="ai_date")
+        # Project Pricing
+        st.header("Project Pricing")
+        col1, col2 = st.columns(2)
+        with col1:
+            landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f", key="ai_landing")
+            admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f", key="ai_admin")
+            crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f", key="ai_crm")
+        with col2:
+            manychat_price = st.number_input("ManyChat & Make Automation", min_value=0.0, step=0.01, format="%.2f", key="ai_manychat")
+            social_media_price = st.number_input("Social Media Automation", min_value=0.0, step=0.01, format="%.2f", key="ai_social")
+            ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f", key="ai_calling")
         
-        # AI Automation specific fields
-        landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f", key="ai_landing")
-        admin_panel_price = st.number_input("Admin Panel", min_value=0.0, step=0.01, format="%.2f", key="ai_admin")
-        crm_price = st.number_input("CRM Automations", min_value=0.0, step=0.01, format="%.2f", key="ai_crm")
-        manychat_price = st.number_input("Manychat", min_value=0.0, step=0.01, format="%.2f", key="ai_manychat")
-        social_media_price = st.number_input("Social Media", min_value=0.0, step=0.01, format="%.2f", key="ai_social")
-        ai_calling_price = st.number_input("AI Calling", min_value=0.0, step=0.01, format="%.2f", key="ai_calling")
-        total_price = st.number_input("Total", min_value=0.0, step=0.01, format="%.2f", key="ai_total")
-        annual_maintenance = st.number_input("Annual Maintenance", min_value=0.0, step=0.01, format="%.2f", key="ai_maintenance")
-        additional_features_price = st.number_input("Additional Features", min_value=0.0, step=0.01, format="%.2f", key="ai_additional")
-        company_representative = st.text_input("Company Representative", key="ai_rep")
+        # Additional Features & Enhancements
+        additional_features_price = st.number_input("Additional Features & Enhancements (USD per week)", 
+                                                  min_value=0.0, 
+                                                  step=0.01, 
+                                                  format="%.2f",
+                                                  value=250.00)  # Default value set to 250
+        
+        total_price = (landing_page_price + admin_panel_price + crm_price + 
+                      manychat_price + social_media_price + ai_calling_price)
+        annual_maintenance = total_price * 0.20
+        
+        # Signature Details
+        st.header("Signature Details")
+        company_representative = st.text_input("Company Representative")
 
         # Update replacements for AI Automation
-        replacements.update({
+        replacements = {
             "{client_name}": client_name,
             "{Email_address}": email,
             "{Phone_no}": phone,
@@ -218,7 +233,7 @@ def main():
             "{AM price}": annual_maintenance,
             "{Additional}": additional_features_price,
             "{company_representative}": company_representative,
-        })
+        }
 
     elif proposal_type == "Digital Marketing Proposal":
         template_path = os.path.join(TEMPLATE_DIR, "DM Proposal.docx")
@@ -227,13 +242,12 @@ def main():
         st.header("Client Information")
         col1, col2 = st.columns(2)
         with col1:
-            client_name = st.text_input("Client Name", key="dm_name")
+            client_name = st.text_input("Client Name", key="dm_client_name")
             designation = st.text_input("Designation", key="dm_designation")
-        with col2:
             contact_no = st.text_input("Contact Number", key="dm_contact")
+        with col2:
             email_id = st.text_input("Email ID", key="dm_email")
-        
-        proposal_date = st.date_input("Date", datetime.datetime.now(), key="dm_date")
+            proposal_date = st.date_input("Date", datetime.datetime.now(), key="dm_date")
         
         # DM specific fields
         landing_page_price = st.number_input("Landing Page Website", min_value=0.0, step=0.01, format="%.2f", key="dm_landing")
@@ -253,7 +267,7 @@ def main():
         company_representative = st.text_input("Company Representative")
 
         # DM specific replacements
-        replacements.update({
+        replacements = {
             "{client_name}": client_name,
             "{designation}": designation,
             "{contact_no}": contact_no,
@@ -269,7 +283,7 @@ def main():
             "{AM price}": annual_maintenance,
             "{Additional}": additional_features_price,
             "{company_representative}": company_representative,
-        })
+        }
 
     elif proposal_type == "Business Automations Proposal":
         template_path = os.path.join(TEMPLATE_DIR, "Business Automations Proposal.docx")
@@ -303,7 +317,7 @@ def main():
         company_representative = st.text_input("Company Representative")
 
         # Business Automation specific replacements
-        replacements.update({
+        replacements = {
             "{client_name}": client_name,
             "{contact_no}": contact_no,
             "{email_id}": email_id,
@@ -319,7 +333,7 @@ def main():
             "{AM_price}": annual_maintenance,
             "{Additional}": additional_features_price,
             "{company_representative}": company_representative,
-        })
+        }
 
     else:  # IT Consultation Contract
         template_path = os.path.join(TEMPLATE_DIR, "Contract Agreement.docx")
@@ -351,7 +365,7 @@ def main():
         company_representative = st.text_input("Company Representative")
 
         # Contract specific replacements
-        replacements.update({
+        replacements = {
             "{client_name}": client_name,
             "{company_address}": client_company_address,
             "{date}": contract_date.strftime("%d/%m/%Y"),
@@ -365,7 +379,7 @@ def main():
             "{AM_price}": annual_maintenance,
             "{Additional}": additional_features_price,
             "{company_representative}": company_representative,
-        })
+        }
 
     # Generate proposal button and processing
     if st.button("Generate Proposal"):
