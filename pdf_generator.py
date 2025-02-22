@@ -53,6 +53,7 @@ def convert_to_pdf(input_docx, output_pdf):
 TEMPLATE_DIR = "templates"
 template_paths = {
     "AI Automation": "Ai_automation.docx",
+    "AI Automation without LPW": "AI Automations Proposal wiithout lpw.docx",
     "Digital Marketing": "DM Proposal.docx",
     "Business Automations": "Business Automations Proposal.docx",
     "IT Consultation": "Contract Agreement.docx"

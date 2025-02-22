@@ -3,7 +3,10 @@ import datetime
 from pdf_generator import generate_proposal
 
 def render_ai_automation_form():
-    st.header("Client Information")
+    st.header("AI Automation with Landing Page Proposal")
+    
+    # Client Information
+    st.subheader("Client Information")
     col1, col2 = st.columns(2)
     with col1:
         client_name = st.text_input("Client Name", key="ai_name")
@@ -11,7 +14,11 @@ def render_ai_automation_form():
         phone = st.text_input("Phone", key="ai_phone")
     with col2:    
         country = st.text_input("Country", key="ai_country")
-        proposal_date = st.date_input("Date", datetime.datetime.now(), key="ai_date")
+        proposal_date = st.date_input("Proposal Date", key="ai_date")
+        validity_date = st.date_input("Validity Date", 
+                                    value=proposal_date + datetime.timedelta(days=365),  # Default 1 year validity
+                                    min_value=proposal_date,
+                                    help="Proposal validity end date")
     
     # Project Pricing
     st.header("Project Pricing")
@@ -46,6 +53,7 @@ def render_ai_automation_form():
         "{Phone_no}": phone,
         "{country_name}": country,
         "{date}": proposal_date.strftime("%d/%m/%Y"),
+        "{validity_date}": validity_date.strftime("%d/%m/%Y"),
         "{landing page price}": landing_page_price,
         "{admin panel price}": admin_panel_price,
         "{CRM Automation price}": crm_price,
@@ -58,12 +66,16 @@ def render_ai_automation_form():
         "{company_representative}": company_representative,
     }
 
-    if st.button("Generate AI Proposal", key="ai_generate"):
-        result = generate_proposal("AI Automation", client_name, replacements)
+    if st.button("Generate Proposal"):
+        if not client_name:
+            st.error("Please enter client name")
+            return
+            
+        result = generate_proposal("AI Automation with Landing Page", client_name, replacements)
         if result:
             file_data, file_name, mime_type = result
             st.download_button(
-                label=f"Download {file_name}",
+                label="Download Proposal",
                 data=file_data,
                 file_name=file_name,
                 mime=mime_type
