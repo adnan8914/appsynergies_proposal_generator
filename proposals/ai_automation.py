@@ -3,7 +3,7 @@ import datetime
 from pdf_generator import generate_proposal
 
 def render_ai_automation_form():
-    st.header("AI Automation with Landing Page Proposal")
+    st.header("AI Automation")
     
     # Client Information
     st.subheader("Client Information")
@@ -71,7 +71,7 @@ def render_ai_automation_form():
             st.error("Please enter client name")
             return
             
-        result = generate_proposal("AI Automation with Landing Page", client_name, replacements)
+        result = generate_proposal("AI Automation", client_name, replacements)
         if result:
             file_data, file_name, mime_type = result
             st.download_button(

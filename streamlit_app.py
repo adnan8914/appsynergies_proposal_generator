@@ -10,7 +10,7 @@ def main():
     
     proposal_type = st.radio(
         "Select Proposal Type",
-        ["AI Automation", 
+        ["AI Automation",
          "AI Automation without LPW",
          "Digital Marketing", 
          "Business Automations", 
