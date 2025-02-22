@@ -2,9 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -24,6 +22,7 @@ wheels/
 # Virtual Environment
 venv/
 ENV/
+env/
 
 # IDE
 .idea/
@@ -31,9 +30,14 @@ ENV/
 *.swp
 *.swo
 
-# OS
+# Operating System
 .DS_Store
 Thumbs.db
+
+# Project specific
+*.pdf
+# Allow template docx files
+!templates/*.docx
 
 # Streamlit
 +.streamlit/*
